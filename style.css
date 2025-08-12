@@ -1,0 +1,63 @@
+/* === CSS FINAL YANG STABIL === */
+:root {
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --activity-bar-bg:#333;
+  --sidebar-bg:#252526;
+  --editor-bg:#1e1e1e;
+  --preview-bg:#f0f2f5;
+  --border-color:#3e3e42;
+  --text-primary:#cccccc;
+  --text-secondary:#808080;
+  --accent-blue:#007acc;
+  --tab-inactive-bg:#2d2d2d;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
+
+/* === KONTENER BERALIH LAYAR === */
+.view-container { width: 100%; height: 100%; position: relative; }
+.app-view { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
+#editor-view { display: flex; flex-direction: row; opacity: 1; transform: scale(1); z-index: 10; }
+#preview-view { display: none; flex-direction: column; opacity: 0; transform: scale(1.05); pointer-events: none; z-index: 5; background-color: var(--preview-bg); }
+body.show-preview #editor-view { opacity: 0; transform: scale(0.95); pointer-events: none; }
+body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; }
+
+/* === BAGIAN EDITOR (STABIL) === */
+.activity-bar { width: 48px; background: var(--activity-bar-bg); display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 10px 0; flex-shrink: 0; }
+.activity-bar .actions-group { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.icon-btn { color: var(--text-secondary); background: none; border: none; font-size: 18px; padding: 8px; cursor: pointer; width: 100%; }
+.icon-btn:hover { color: var(--text-primary); }
+.sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; transition: width .18s ease; flex-shrink: 0; }
+.sidebar.collapsed { width: 0; overflow: hidden; }
+.sidebar-header { padding: 10px 12px; font-size: 12px; color: var(--text-secondary); text-transform: uppercase; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.file-tree { flex: 1; overflow: auto; padding: 6px 8px; font-size: 14px; min-height: 0; }
+/* ... (aturan file-tree lainnya tetap sama) ... */
+.file-tree ul{list-style:none;margin:0;padding:0}.file-tree ul.nested{padding-left:12px}.file-tree ul.collapsed{display:none}.tree-item{padding:6px 8px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tree-item:hover{background:var(--list-hover-bg,#2a2d2e)}.tree-item.active{background:var(--list-active-bg,#37373d)}.folder-toggle{width:14px;text-align:center;transition:transform .15s}.folder-toggle.expanded{transform:rotate(90deg)}
+
+/* === PERBAIKAN DEFINITIF KOTAK PUTIH === */
+.workbench, .editor-area, .editor-wrap { background-color: var(--editor-bg); }
+.CodeMirror, .CodeMirror-scroll { background-color: var(--editor-bg) !important; }
+
+/* Styling Area Editor & Tab */
+.workbench { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.editor-area { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.editor-tabs { display: flex; background: var(--tab-inactive-bg); flex-shrink: 0; overflow-x: auto; align-items: flex-end; padding: 0 4px; border-top: 1px solid var(--border-color);}
+.editor-tabs .btn { background: var(--tab-inactive-bg); color: var(--text-secondary); border: none; border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 8px 12px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; margin-top: 5px; border-top-left-radius: 4px; border-top-right-radius: 4px; }
+.editor-tabs .btn:first-child { border-left: 1px solid var(--border-color); }
+.editor-tabs .btn.active { background: var(--editor-bg); color: var(--text-primary); border-top-color: var(--accent-blue); border-top-width: 2px; border-bottom: 1px solid var(--editor-bg); margin-top: 3px; }
+.editor-tabs .btn .filename { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+.editor-tabs .btn .close-btn { font-weight: bold; cursor: pointer; padding: 0 4px; color: var(--text-secondary); font-size: 16px; line-height: 1; border-radius: 3px; margin-left: 8px; opacity: .5; }
+.editor-tabs .btn:hover .close-btn { opacity: 1; background: rgba(255, 255, 255, .1); }
+.editor-wrap { flex: 1; display: flex; min-height: 0; position: relative; }
+.cm-container { flex: 1; position: relative; min-height: 0; }
+
+/* === BAGIAN PREVIEW === */
+.preview-header { flex-shrink: 0; padding: 8px 16px; background-color: white; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.btn-back-to-editor { background: #333; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.preview-header .view-mode-controls { display: flex; border: 1px solid #ccc; border-radius: 5px; overflow: hidden; }
+.btn-view-mode { background: white; border: none; color: #555; padding: 6px 12px; cursor: pointer; font-size: 14px; }
+.btn-view-mode:not(:last-child) { border-right: 1px solid #ccc; }
+.btn-view-mode.active { background-color: var(--accent-blue); color: white; }
+.preview-content { flex-grow: 1; padding: 40px; display: flex; align-items: center; justify-content: center; overflow: auto; }
+/* ... (aturan device-frame lainnya tetap sama) ... */
+.device-frame{position:relative;box-shadow:0 10px 40px rgba(0,0,0,.15);transition:all .4s cubic-bezier(.25,1,.5,1)}.device-frame iframe{display:block;width:100%;height:100%;border:none;background:white}#preview-view.view-desktop .device-frame{width:95%;height:95%;background:#111;border:12px solid #222;border-radius:10px;padding:20px;padding-bottom:50px}#preview-view.view-desktop .device-frame::after{content:'';position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:20%;height:20px;background:#222;border-bottom-left-radius:8px;border-bottom-right-radius:8px}#preview-view.view-mobile .device-frame{width:375px;height:812px;background:#111;border:10px solid #1c1c1c;border-radius:54px;padding:10px}#preview-view.view-mobile .device-frame iframe{border-radius:44px}#preview-view.view-mobile .device-frame::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:55%;height:28px;background:#111;border-bottom-left-radius:18px;border-bottom-right-radius:18px;z-index:10}
