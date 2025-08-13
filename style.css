@@ -30,7 +30,7 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-wrap { flex-grow: 1; position: relative; background-color: var(--editor-bg); }
 .cm-container { position: absolute; inset: 0; }
 .CodeMirror { height: 100% !important; background: transparent !important; }
-/* ... (Styling lain yang tidak berubah: .icon-btn, .sidebar-header, .file-tree, .tree-item, .folder-toggle, .editor-tabs) ... */
+/* ... (Styling lain yang tidak berubah) ... */
 .icon-btn{color:var(--text-secondary);background:none;border:none;font-size:18px;padding:8px;cursor:pointer;width:100%}.icon-btn:hover{color:var(--text-primary)}
 .sidebar-header{padding:10px 12px;font-size:12px;color:var(--text-secondary);text-transform:uppercase;display:flex;align-items:center;gap:8px}
 .file-tree{flex:1;overflow:auto;padding:6px 8px;font-size:14px}
@@ -46,42 +46,63 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-tabs .btn:hover .close-btn{opacity:1;background:rgba(255,255,255,.1)}
 
 
-/* PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL */
+/* === PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL (VERSI FINAL) === */
 .preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
 .btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
 .preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
 .device-frame { display: flex; flex-direction: column; transition: all 0.4s ease; }
 .device-frame iframe{ flex-grow: 1; border: none; }
 
-/* BINGKAI DESKTOP GAYA "LOCALHOST" */
+/* BINGKAI DESKTOP GAYA "LOCALHOST" (STABIL) */
 #preview-view.view-desktop .device-frame {
     width: 90vw; max-width: 1400px; aspect-ratio: 16 / 9; max-height: 88vh;
     border-radius: 8px; border: 1px solid #ccc; background-color: white;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
-.browser-bar {
-    flex-shrink: 0; padding: 8px; background-color: #e8e6e8;
-    border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 8px;
-}
+.browser-bar { flex-shrink: 0; padding: 8px; background-color: #e8e6e8; border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 8px; }
 .dots { display: flex; gap: 6px; }
 .dot { width: 12px; height: 12px; border-radius: 50%; }
-.address-bar {
-    flex-grow: 1; background-color: white; color: #555;
-    padding: 4px 12px; border-radius: 4px; font-size: 13px;
-    font-family: monospace; white-space: nowrap; overflow: hidden;
-    text-overflow: ellipsis; border: 1px solid #ddd;
-}
+.address-bar { flex-grow: 1; background-color: white; color: #555; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid #ddd; }
 
-/* BINGKAI IPHONE 3D & RESPONSIF */
+/* === PERBAIKAN TOTAL: BINGKAI IPHONE 3D & RESPONSIF === */
 #preview-view.view-mobile .device-frame {
-    width: 375px; max-width: 95vw; aspect-ratio: 375 / 812; max-height: 95vh;
-    position: relative; border-radius: 50px; background: #111; padding: 12px;
-    box-shadow: inset 0 0 3px rgba(255, 255, 255, 0.2), 0 0 0 2px #333, 0 25px 40px -10px rgba(0,0,0,0.4);
+    /* Ukuran dasar yang proporsional dan lebih kecil */
+    --iphone-h: 700px;
+    --iphone-w: calc(var(--iphone-h) * (375 / 812)); /* Menjaga rasio iPhone X */
+    
+    width: var(--iphone-w);
+    height: var(--iphone-h);
+    
+    /* Batasan agar tidak meluap di layar manapun */
+    max-width: 90vw;
+    max-height: 90vh;
+    
+    position: relative;
+    border-radius: 50px;
+    background: #1e1e1e; /* Warna dasar lebih gelap */
+    padding: 12px;
+    
+    /* Efek 3D berlapis */
+    border: 2px solid #444;
+    box-shadow: 
+        inset 0 0 5px rgba(0, 0, 0, 0.5), /* Bayangan dalam */
+        0 4px 8px rgba(0,0,0,0.3),  /* Bayangan bawah dekat */
+        0 20px 30px rgba(0,0,0,0.2); /* Bayangan jauh */
 }
 #preview-view.view-mobile .browser-bar { display: none; }
 #preview-view.view-mobile iframe { border-radius: 38px; }
-#preview-view.view-mobile::before {
-    content: ''; position: absolute; top: 12px; left: 50%;
-    transform: translateX(-50%); width: 45%; height: 25px;
-    background: #111; border-bottom-left-radius: 13px; border-bottom-right-radius: 13px; z-index: 2;
+
+/* PONI YANG DIPERBAIKI SECARA FUNDAMENTAL */
+#preview-view.view-mobile .device-frame::before {
+    content: '';
+    position: absolute;
+    top: 12px; /* Menempel di dalam padding */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45%;
+    height: 25px;
+    background: #1e1e1e; /* Sama dengan warna bingkai */
+    border-bottom-left-radius: 13px;
+    border-bottom-right-radius: 13px;
+    z-index: 2; /* Di atas iframe */
 }
