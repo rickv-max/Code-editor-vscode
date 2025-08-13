@@ -11,44 +11,25 @@
   --tab-inactive-bg: #2d2d2d;
 }
 * { box-sizing: border-box; }
+html, body { height: 100vh; margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
 
-/* PERBAIKAN: Memastikan Rantai Tinggi 100% tidak putus */
-html, body, .view-container, #editor-view {
-    height: 100%;
-}
-body { margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
-
-/* KONTENER BERALIH LAYAR */
-.view-container { position: relative; }
+/* LAYOUT KONTENER UTAMA */
+.view-container { width: 100%; height: 100%; position: relative; }
 .app-view { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
 #editor-view { display: flex; opacity: 1; transform: scale(1); z-index: 10; }
 #preview-view { display: none; flex-direction: column; opacity: 0; transform: scale(1.05); pointer-events: none; z-index: 5; background-color: var(--preview-bg); }
 body.show-preview #editor-view { opacity: 0; transform: scale(0.95); pointer-events: none; }
 body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; }
 
-/* PERBAIKAN: Layout Panel Kode Full & Menu Bar Rapi */
+/* PERBAIKAN: LAYOUT EDITOR FULL KE BAWAH */
 .activity-bar { width: 48px; flex-shrink: 0; background: var(--activity-bar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; }
 .sidebar { width: 260px; flex-shrink: 0; transition: width .18s ease; background: var(--sidebar-bg); display: flex; flex-direction: column; }
 .sidebar.collapsed { width: 0; }
-.workbench {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-.editor-area {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    background-color: var(--editor-bg);
-}
-.editor-wrap {
-    flex-grow: 1;
-    position: relative;
-}
+.workbench { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.editor-area { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.editor-wrap { flex: 1; position: relative; background-color: var(--editor-bg); } /* Penting */
 .cm-container { position: absolute; inset: 0; }
-.CodeMirror, .CodeMirror-scroll { background-color: var(--editor-bg) !important; }
+.CodeMirror { height: 100% !important; }
 
 /* Styling lain yang tidak berubah */
 .icon-btn{color:var(--text-secondary);background:none;border:none;font-size:18px;padding:8px;cursor:pointer;width:100%}.icon-btn:hover{color:var(--text-primary)}
@@ -65,24 +46,60 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-tabs .btn .close-btn{font-weight:bold;cursor:pointer;padding:0 4px;color:var(--text-secondary);font-size:16px;line-height:1;border-radius:3px;margin-left:8px;opacity:.5}
 .editor-tabs .btn:hover .close-btn{opacity:1;background:rgba(255,255,255,.1)}
 
-/* PERBAIKAN: Preview Responsif */
+/* PERBAIKAN: PREVIEW RESPONSIF & GAYA BARU */
 .preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
 .btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
-.preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
-.device-frame{position:relative;transition:all .4s ease;box-shadow:0 20px 50px rgba(0,0,0,.2)}
-.device-frame iframe{display:block;width:100%;height:100%;border:none;background:white}
-
-/* BINGKAI DESKTOP LEBIH TIPIS & RESPONSIF */
-#preview-view.view-desktop .device-frame{
-    width:90vw;height:calc(90vw * 9 / 16);max-width:1400px;max-height:85vh;
-    background:#111;border:8px solid #222;border-radius:8px;padding:1rem;padding-bottom:2.5rem
+.preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:2rem;overflow:auto}
+.device-frame {
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
 }
-#preview-view.view-desktop .device-frame::after{content:'';position:absolute;bottom:-1.2rem;left:50%;transform:translateX(-50%);width:20%;height:1.2rem;background:#222;border-bottom-left-radius:6px;border-bottom-right-radius:6px}
+.device-frame iframe{ flex-grow: 1; border: none; }
 
-/* BINGKAI PONSEL RESPONSIF */
-#preview-view.view-mobile .device-frame{
-    width:375px;height:812px;flex-shrink:0;max-width:90vw;max-height:90vh;
-    background:#111;border:8px solid #1c1c1c;border-radius:44px;padding:8px
+/* BINGKAI DESKTOP GAYA "LOCALHOST" */
+#preview-view.view-desktop .device-frame {
+    width: 90vw;
+    height: 85vh;
+    max-width: 1600px;
+    border: 1px solid #ccc;
 }
-#preview-view.view-mobile .device-frame iframe{border-radius:36px}
-#preview-view.view-mobile .device-frame::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:55%;height:26px;background:#111;border-bottom-left-radius:16px;border-bottom-right-radius:16px;z-index:10}
+.browser-bar {
+    flex-shrink: 0;
+    padding: 8px;
+    background-color: #e8e6e8;
+    border-bottom: 1px solid #ccc;
+}
+.dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+
+/* BINGKAI PONSEL GAYA FISIK (DIBUAT RESPONSIF) */
+#preview-view.view-mobile .device-frame {
+    width: 375px;
+    height: 812px;
+    flex-shrink: 0;
+    max-width: 95vw; /* Agar tidak meluap di layar kecil */
+    max-height: 90vh;
+    border: 8px solid #1c1c1c;
+    border-radius: 44px;
+    padding: 8px;
+    background: #111;
+}
+#preview-view.view-mobile .browser-bar { display: none; } /* Sembunyikan bar browser di mode ponsel */
+#preview-view.view-mobile iframe { border-radius: 36px; }
+#preview-view.view-mobile::before {
+    content: '';
+    position: absolute;
+    top: 16px; /* 8px border + 8px padding */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 26px;
+    background: #111;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    z-index: 10;
+}
