@@ -37,23 +37,18 @@ async function importZip(file) {
 }
 async function postImportSetup() {
     ensureDefaultFiles();
-    renderTree(); // Panggil renderTree sebelum membuka file agar explorer terisi
+    renderTree();
     const firstCode = Object.keys(state.files).find(k => k.endsWith('index.html')) || Object.keys(state.files).filter(isCodeFile)[0];
     await openFile(firstCode);
     runPreview();
 }
 
-// PERBAIKAN: Logika pembersihan memori yang benar
 function runPreview() {
-    // 1. Bersihkan aset dari preview SEBELUMNYA
     Object.values(state.activeAssetMap).forEach(URL.revokeObjectURL);
     state.activeAssetMap = {};
-
     const indexKey = Object.keys(state.files).find(k => k.endsWith('index.html'));
     if (!indexKey) return;
     let html = state.files[indexKey].text || '';
-
-    // 2. Buat peta aset baru untuk preview SAAT INI
     const getMimeType = (path) => { if (path.endsWith('.css')) return 'text/css'; if (path.endsWith('.js')) return 'application/javascript'; return 'text/plain'; };
     for (const path in state.files) {
         const fileData = state.files[path];
@@ -63,10 +58,7 @@ function runPreview() {
             state.activeAssetMap[path] = URL.createObjectURL(blob);
         }
     }
-    // Gabungkan dengan aset gambar
     Object.assign(state.activeAssetMap, state.assetUrls);
-    
-    // 3. Ganti path di HTML dengan URL dari peta aset baru
     const pathReplacer = (match, attribute, pathValue) => {
         if (!pathValue || pathValue.startsWith('http') || pathValue.startsWith('data:') || pathValue.startsWith('//')) return match;
         const cleanPathValue = pathValue.replace(/^\.\//, ''); let matchedAssetKey = null;
@@ -80,11 +72,9 @@ function runPreview() {
         return match;
     };
     html = html.replace(/(src|href)=["']([^"']+)["']/g, pathReplacer);
-
-    // 4. Buat URL untuk HTML itu sendiri dan tampilkan
     const finalBlob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(finalBlob);
-    state.activeAssetMap['__main_html__'] = url; // Simpan juga URL utama ini
+    state.activeAssetMap['__main_html__'] = url;
     ui.previewIframe.src = url;
 }
 
@@ -116,8 +106,6 @@ function renderTabs() {
     const codeFiles=Object.keys(state.files).filter(isCodeFile).sort((a,b)=>{const o={html:1,css:2,js:3};return(o[a.split('.').pop()]||99)-(o[b.split('.').pop()]||99)});
     codeFiles.forEach(path=>{const btn=document.createElement('button');btn.className=`btn ${path===state.currentPath?'active':''}`;btn.onclick=()=>openFile(path);const ext=path.split('.').pop();let i='fa-regular fa-file-code';if(ext==='html')i='fa-brands fa-html5';if(ext==='css')i='fa-brands fa-css3-alt';if(ext==='js')i='fa-brands fa-js';const filename=path.split('/').pop();btn.innerHTML=`<i class="${i}"></i> <span class="filename">${filename}</span> <span class="close-btn">&times;</span>`;btn.querySelector('.close-btn').onclick=(e)=>{e.stopPropagation();console.log("Fungsi close belum diimplementasikan untuk:",path)};ui.editorTabsContainer.appendChild(btn)})
 }
-
-// PERBAIKAN: Fungsi renderTree yang berfungsi
 function renderTree() {
     const filePaths = Object.keys(state.files);
     ui.treeContainer.innerHTML = filePaths.length ? '' : '(kosong)';
@@ -148,8 +136,6 @@ function renderTree() {
     }
     ui.treeContainer.appendChild(createHtml(tree));
 }
-
-// PERBAIKAN: Fungsi ensureDefaultFiles yang berfungsi
 function ensureDefaultFiles() {
     if (Object.keys(state.files).length > 0) return;
     state.files['index.html'] = { text: '<h1>Selamat Datang!</h1>\n<p>Klik <i class="fa-solid fa-play"></i> untuk preview.</p>\n<link rel="stylesheet" href="style.css">\n<script src="script.js"></script>', isBinary: false };
