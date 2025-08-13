@@ -17,18 +17,15 @@ const ui = {
   mobileViewBtn: document.getElementById('mobile-view-btn'),
 };
 
-// === STATE APLIKASI ===
 const state = { files: {}, assetUrls: {}, currentPath: null };
 const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {mode: 'htmlmixed', theme: 'dracula', lineNumbers: true, autoCloseBrackets: true, viewportMargin: Infinity});
 
-// === FUNGSI BANTU ===
 function debounce(func, delay) {let timeout; return function(...args) {clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay);};}
 const isBinaryFile = (name = '') => /\.(jpe?g|png|gif|svg|webp|ico|bmp)$/i.test(name);
 const isCodeFile = (name = '') => /\.(html?|css|js)$/i.test(name);
 function showPreview() { ui.body.classList.add('show-preview'); }
 function showEditor() { ui.body.classList.remove('show-preview'); }
 
-// === FUNGSI INTI ===
 async function processFiles(fileList) {
   clearAll(); for (const file of fileList) { const name = file.webkitRelativePath || file.name; if (!name) continue; const binary = isBinaryFile(name); if (binary) { state.assetUrls[name] = URL.createObjectURL(file); state.files[name] = { file, text: undefined, isBinary: true }; } else { state.files[name] = { file, text: await file.text(), isBinary: false }; } }
   await postImportSetup();
@@ -68,7 +65,6 @@ function runPreview() {
   ui.previewIframe.src = url;
 }
 
-// === EVENT LISTENERS ===
 ui.runBtn.addEventListener('click', showPreview);
 ui.backToEditorBtn.addEventListener('click', showEditor);
 ui.desktopViewBtn.addEventListener('click', () => { ui.previewView.classList.replace('view-mobile', 'view-desktop'); ui.desktopViewBtn.classList.add('active'); ui.mobileViewBtn.classList.remove('active'); });
@@ -80,14 +76,19 @@ ui.folderInput.onchange = e => { if(e.target.files.length) processFiles(e.target
 ui.zipInput.onchange = e => { if(e.target.files[0]) importZip(e.target.files[0]); e.target.value = ''; };
 ui.clearBtn.onclick = clearAll;
 
-// === FUNGSI UTILITAS (RENDER TABS, TREE, DLL) ===
 function clearAll(){
   Object.values(state.assetUrls).forEach(URL.revokeObjectURL);
   Object.assign(state, {files:{}, assetUrls:{}, currentPath:null});
   renderTabs(); renderTree(); editor.setValue('// Editor kosong'); ui.previewIframe.src = 'about:blank';
 }
 async function openFile(path) {
-  if(!path || !state.files[path] || path === state.currentPath) return;
+  if(!path || !state.files[path]) return;
+  if(isBinaryFile(path) && state.assetUrls[path]) {
+      // Fitur preview gambar biner bisa ditambahkan di sini jika perlu
+      console.log("Membuka file biner:", path);
+      return;
+  }
+  if (path === state.currentPath) return;
   state.currentPath = path; editor.setValue(state.files[path].text ?? '');
   const getMode = p => { if(p.endsWith('.css')) return 'css'; if(p.endsWith('.js')) return 'javascript'; return 'htmlmixed'; };
   editor.setOption('mode', getMode(path)); renderTabs(); setTimeout(()=>editor.refresh(), 50);
@@ -105,13 +106,93 @@ function renderTabs() {
       ui.editorTabsContainer.appendChild(btn);
   });
 }
-function renderTree() { /* Salin kode fungsi renderTree Anda yang ada ke sini */ }
-function ensureDefaultFiles() { /* Salin kode fungsi ensureDefaultFiles Anda yang ada ke sini */ }
 
-// === Inisialisasi awal ===
+// PERBAIKAN 2: FUNGSI renderTree YANG LENGKAP
+function renderTree() {
+    const filePaths = Object.keys(state.files);
+    if (filePaths.length === 0) {
+        ui.treeContainer.innerHTML = '(kosong)';
+        return;
+    }
+
+    const tree = {};
+    filePaths.forEach(path => {
+        let node = tree;
+        path.split('/').forEach((part, index, arr) => {
+            if (!node[part]) node[part] = {};
+            if (index === arr.length - 1) node[part].__path = path;
+            node = node[part];
+        });
+    });
+
+    function createHtml(node, isRoot = true) {
+        const ul = document.createElement('ul');
+        if (!isRoot) ul.className = 'nested collapsed';
+
+        const sortedKeys = Object.keys(node).sort((a, b) => {
+            if (a === '__path' || b === '__path') return 0;
+            const aIsFile = node[a].__path;
+            const bIsFile = node[b].__path;
+            if (!aIsFile && bIsFile) return -1; // folder first
+            if (aIsFile && !bIsFile) return 1;
+            return a.localeCompare(b);
+        });
+
+        sortedKeys.forEach(key => {
+            if (key === '__path') return;
+
+            const li = document.createElement('li');
+            const itemData = node[key];
+            const isFile = !!itemData.__path;
+            
+            if (isFile) {
+                const ext = key.split('.').pop();
+                let iconClass = 'fa-regular fa-file';
+                if (isBinaryFile(key)) iconClass = 'fa-regular fa-image';
+                else if(isCodeFile(key)) iconClass = 'fa-regular fa-file-code';
+
+                li.innerHTML = `<div class="tree-item" data-path="${itemData.__path}"><i class="${iconClass}"></i> ${key}</div>`;
+                li.querySelector('.tree-item').onclick = () => {
+                    openFile(itemData.__path);
+                    document.querySelectorAll('.tree-item.active').forEach(el => el.classList.remove('active'));
+                    li.querySelector('.tree-item').classList.add('active');
+                };
+            } else { // It's a folder
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'tree-item';
+                folderDiv.innerHTML = `<span class="folder-toggle"><i class="fa-solid fa-chevron-right"></i></span> ${key}`;
+                
+                const nestedUl = createHtml(itemData, false);
+                li.appendChild(folderDiv);
+                li.appendChild(nestedUl);
+
+                folderDiv.onclick = (e) => {
+                    e.currentTarget.querySelector('.folder-toggle').classList.toggle('expanded');
+                    nestedUl.classList.toggle('collapsed');
+                };
+            }
+            ul.appendChild(li);
+        });
+        return ul;
+    }
+    ui.treeContainer.innerHTML = '';
+    ui.treeContainer.appendChild(createHtml(tree));
+}
+
+// PERBAIKAN 2: FUNGSI ensureDefaultFiles YANG LENGKAP
+function ensureDefaultFiles() {
+    const defaults = ['index.html', 'style.css', 'script.js'];
+    defaults.forEach(file => {
+        if (!Object.keys(state.files).some(key => key.endsWith(file))) {
+            state.files[file] = { text: `/* ${file} - Dibuat otomatis */`, isBinary: false, file: null };
+        }
+    });
+}
+
+// Inisialisasi awal
 (async function init() {
-  state.files['index.html'] = { text: '<h1>Selamat Datang!</h1>\n<p>Klik tombol <i class="fa-solid fa-play"></i> untuk melihat preview.</p>\n<link rel="stylesheet" href="style.css">\n<script src="script.js"></script>', isBinary: false };
-  state.files['style.css'] = { text: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; text-align: center; margin-top: 50px; background-color: #f0f8ff; } h1 { color: #005a9c; }', isBinary: false };
-  state.files['script.js'] = { text: 'console.log("Selamat datang di Editor Real-time!");', isBinary: false };
+  state.files['index.html'] = { text: '<h1>Selamat Datang!</h1>\n<p>Klik <i class="fa-solid fa-play"></i> untuk preview.</p>\n<link rel="stylesheet" href="style.css">\n<script src="script.js"></script>', isBinary: false };
+  state.files['style.css'] = { text: 'body { font-family: sans-serif; text-align: center; margin-top: 50px; background-color: #f0f8ff; }', isBinary: false };
+  state.files['script.js'] = { text: 'console.log("Selamat datang!");', isBinary: false };
   await postImportSetup();
 })();
