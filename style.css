@@ -11,23 +11,28 @@
   --tab-inactive-bg: #2d2d2d;
 }
 * { box-sizing: border-box; }
-html, body { height: 100vh; margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
 
-/* LAYOUT KONTENER UTAMA */
-.view-container { width: 100%; height: 100%; position: relative; }
+/* PERBAIKAN: Memastikan Rantai Tinggi 100% tidak putus */
+html, body, .view-container, #editor-view {
+    height: 100vh; /* Gunakan vh untuk kepastian */
+}
+body { margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
+
+/* KONTENER BERALIH LAYAR */
+.view-container { position: relative; }
 .app-view { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
 #editor-view { display: flex; opacity: 1; transform: scale(1); z-index: 10; }
 #preview-view { display: none; flex-direction: column; opacity: 0; transform: scale(1.05); pointer-events: none; z-index: 5; background-color: var(--preview-bg); }
 body.show-preview #editor-view { opacity: 0; transform: scale(0.95); pointer-events: none; }
 body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; }
 
-/* PERBAIKAN: LAYOUT EDITOR FULL KE BAWAH */
+/* PERBAIKAN: Layout Panel Kode Full */
 .activity-bar { width: 48px; flex-shrink: 0; background: var(--activity-bar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; }
 .sidebar { width: 260px; flex-shrink: 0; transition: width .18s ease; background: var(--sidebar-bg); display: flex; flex-direction: column; }
 .sidebar.collapsed { width: 0; }
-.workbench { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.editor-area { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.editor-wrap { flex: 1; position: relative; background-color: var(--editor-bg); } /* Penting */
+.workbench { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
+.editor-area { flex-grow: 1; display: flex; flex-direction: column; min-height: 0; }
+.editor-wrap { flex-grow: 1; position: relative; background-color: var(--editor-bg); }
 .cm-container { position: absolute; inset: 0; }
 .CodeMirror { height: 100% !important; }
 
@@ -46,10 +51,10 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-tabs .btn .close-btn{font-weight:bold;cursor:pointer;padding:0 4px;color:var(--text-secondary);font-size:16px;line-height:1;border-radius:3px;margin-left:8px;opacity:.5}
 .editor-tabs .btn:hover .close-btn{opacity:1;background:rgba(255,255,255,.1)}
 
-/* PERBAIKAN: PREVIEW RESPONSIF & GAYA BARU */
+/* === PERBAIKAN: PREVIEW RESPONSIF & LAYOUT === */
 .preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
 .btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
-.preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:2rem;overflow:auto}
+.preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
 .device-frame {
     display: flex;
     flex-direction: column;
@@ -57,49 +62,42 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
     border-radius: 8px;
     overflow: hidden;
     background-color: white;
+    transition: all 0.4s ease;
 }
 .device-frame iframe{ flex-grow: 1; border: none; }
 
-/* BINGKAI DESKTOP GAYA "LOCALHOST" */
+/* BINGKAI DESKTOP GAYA "LOCALHOST" - PANJANG KE SAMPING */
 #preview-view.view-desktop .device-frame {
-    width: 90vw;
-    height: 85vh;
-    max-width: 1600px;
+    width: 90vw; /* Lebar 90% dari layar */
+    max-width: 1400px;
+    aspect-ratio: 16 / 9; /* PAKSA RASIO LAYAR LEBAR (INI KUNCINYA!) */
+    max-height: 85vh; /* Jangan sampai terlalu tinggi */
     border: 1px solid #ccc;
 }
 .browser-bar {
-    flex-shrink: 0;
-    padding: 8px;
-    background-color: #e8e6e8;
+    flex-shrink: 0; padding: 8px; background-color: #e8e6e8;
     border-bottom: 1px solid #ccc;
 }
 .dots { display: flex; gap: 6px; }
 .dot { width: 12px; height: 12px; border-radius: 50%; }
 
-/* BINGKAI PONSEL GAYA FISIK (DIBUAT RESPONSIF) */
+/* BINGKAI PONSEL GAYA FISIK - RESPONSIF */
 #preview-view.view-mobile .device-frame {
     width: 375px;
     height: 812px;
     flex-shrink: 0;
-    max-width: 95vw; /* Agar tidak meluap di layar kecil */
-    max-height: 90vh;
+    max-width: 95vw; /* Agar tidak meluap di layar HP yang lebih kecil */
+    max-height: 90vh; /* Agar tidak meluap secara vertikal */
     border: 8px solid #1c1c1c;
     border-radius: 44px;
     padding: 8px;
     background: #111;
 }
-#preview-view.view-mobile .browser-bar { display: none; } /* Sembunyikan bar browser di mode ponsel */
+#preview-view.view-mobile .browser-bar { display: none; }
 #preview-view.view-mobile iframe { border-radius: 36px; }
 #preview-view.view-mobile::before {
-    content: '';
-    position: absolute;
-    top: 16px; /* 8px border + 8px padding */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50%;
-    height: 26px;
-    background: #111;
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
-    z-index: 10;
+    content: ''; position: absolute; top: 16px; left: 50%;
+    transform: translateX(-50%); width: 50%; height: 26px;
+    background: #111; border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px; z-index: 10;
 }
