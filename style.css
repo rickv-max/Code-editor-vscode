@@ -3,7 +3,7 @@
   --activity-bar-bg: #333;
   --sidebar-bg: #252526;
   --editor-bg: #1e1e1e;
-  --preview-bg: #e9eef2; /* Latar belakang lebih lembut */
+  --preview-bg: #e9eef2;
   --border-color: #3e3e42;
   --text-primary: #cccccc;
   --text-secondary: #808080;
@@ -21,7 +21,7 @@ html, body { height: 100vh; margin: 0; font-family: var(--font-family); backgrou
 body.show-preview #editor-view { opacity: 0; transform: scale(0.95); pointer-events: none; }
 body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; }
 
-/* LAYOUT EDITOR (STABIL) */
+/* LAYOUT EDITOR FULL (STABIL) */
 .activity-bar { width: 48px; flex-shrink: 0; background: var(--activity-bar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; }
 .sidebar { width: 260px; flex-shrink: 0; transition: width .18s ease; background: var(--sidebar-bg); display: flex; flex-direction: column; }
 .sidebar.collapsed { width: 0; }
@@ -46,7 +46,7 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-tabs .btn:hover .close-btn{opacity:1;background:rgba(255,255,255,.1)}
 
 
-/* === PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL === */
+/* PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL */
 .preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
 .btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
 .preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
@@ -55,65 +55,33 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 
 /* BINGKAI DESKTOP GAYA "LOCALHOST" */
 #preview-view.view-desktop .device-frame {
-    width: 90vw;
-    max-width: 1400px;
-    aspect-ratio: 16 / 9;
-    max-height: 88vh;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background-color: white;
+    width: 90vw; max-width: 1400px; aspect-ratio: 16 / 9; max-height: 88vh;
+    border-radius: 8px; border: 1px solid #ccc; background-color: white;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
-.browser-bar { flex-shrink: 0; padding: 8px; background-color: #e8e6e8; border-bottom: 1px solid #ccc; }
+.browser-bar {
+    flex-shrink: 0; padding: 8px; background-color: #e8e6e8;
+    border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 8px;
+}
 .dots { display: flex; gap: 6px; }
 .dot { width: 12px; height: 12px; border-radius: 50%; }
+.address-bar {
+    flex-grow: 1; background-color: white; color: #555;
+    padding: 4px 12px; border-radius: 4px; font-size: 13px;
+    font-family: monospace; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; border: 1px solid #ddd;
+}
 
 /* BINGKAI IPHONE 3D & RESPONSIF */
 #preview-view.view-mobile .device-frame {
-    --iphone-width: 320px; /* Ukuran dasar yang lebih kecil & aman */
-    width: var(--iphone-width);
-    max-width: 90vw; /* Tidak akan meluap dari layar */
-    aspect-ratio: 375 / 812; /* Rasio iPhone X */
-    max-height: 90vh;
-    
-    position: relative;
-    border-radius: 50px;
-    background: #111;
-    padding: 12px; /* Jarak antara bingkai dan layar */
-    box-shadow: 
-        inset 0 0 4px rgba(255, 255, 255, 0.2), /* Kilau dalam */
-        0 0 0 2px #333, /* Garis luar tipis */
-        0 25px 40px -10px rgba(0,0,0,0.4); /* Bayangan 3D */
+    width: 375px; max-width: 95vw; aspect-ratio: 375 / 812; max-height: 95vh;
+    position: relative; border-radius: 50px; background: #111; padding: 12px;
+    box-shadow: inset 0 0 3px rgba(255, 255, 255, 0.2), 0 0 0 2px #333, 0 25px 40px -10px rgba(0,0,0,0.4);
 }
 #preview-view.view-mobile .browser-bar { display: none; }
 #preview-view.view-mobile iframe { border-radius: 38px; }
-
-/* PONI IPHONE 3D */
-#preview-view.view-mobile .device-frame::before {
-    content: '';
-    position: absolute;
-    top: 12px; /* Sama dengan padding */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 45%;
-    height: 25px;
-    background: #111;
-    border-bottom-left-radius: 13px;
-    border-bottom-right-radius: 13px;
-    z-index: 2;
+#preview-view.view-mobile::before {
+    content: ''; position: absolute; top: 12px; left: 50%;
+    transform: translateX(-50%); width: 45%; height: 25px;
+    background: #111; border-bottom-left-radius: 13px; border-bottom-right-radius: 13px; z-index: 2;
 }
-
-/* === TRIK KONTEN RESPONSIF DALAM IFRAME === */
-/* Ini mensimulasikan media query di dalam iframe, membuat konten beradaptasi */
-/* Untuk Desktop */
-#preview-view.view-desktop iframe {
-    --iframe-width: 90vw; /* Sama dengan lebar bingkai */
-    max-width: 1400px;
-}
-/* Untuk Mobile */
-#preview-view.view-mobile iframe {
-    --iframe-width: 320px; /* Sama dengan lebar ideal iPhone */
-    max-width: 90vw;
-}
-/* Kode ini disuntikkan ke dalam iframe untuk membuat konten responsif */
-/* Contoh: h1 { font-size: calc(var(--iframe-width) * 0.1); } */
