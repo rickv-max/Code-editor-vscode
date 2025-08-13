@@ -43,7 +43,6 @@ async function postImportSetup() {
     runPreview();
 }
 
-// FUNGSI runPreview STABIL (TANPA SUNTIKAN CSS)
 function runPreview() {
     Object.values(state.activeAssetMap).forEach(URL.revokeObjectURL);
     state.activeAssetMap = {};
@@ -79,20 +78,86 @@ function runPreview() {
     ui.previewIframe.src = url;
 }
 
-// Sisa script.js tidak berubah...
+// === EVENT LISTENERS ===
 ui.runBtn.addEventListener('click', showPreview);
 ui.backToEditorBtn.addEventListener('click', showEditor);
 ui.desktopViewBtn.addEventListener('click', () => { ui.previewView.classList.replace('view-mobile', 'view-desktop'); ui.desktopViewBtn.classList.add('active'); ui.mobileViewBtn.classList.remove('active'); });
 ui.mobileViewBtn.addEventListener('click', () => { ui.previewView.classList.replace('view-desktop', 'view-mobile'); ui.mobileViewBtn.classList.add('active'); ui.desktopViewBtn.classList.remove('active'); });
-editor.on('change', debounce(runPreview, 500));
 ui.toggleExplorerBtn.addEventListener('click', () => ui.sidebar.classList.toggle('collapsed'));
 ui.collapseSidebarBtn.addEventListener('click', () => ui.sidebar.classList.toggle('collapsed'));
 ui.folderInput.onchange = e => { if(e.target.files.length) processFiles(e.target.files); e.target.value = ''; };
 ui.zipInput.onchange = e => { if(e.target.files[0]) importZip(e.target.files[0]); e.target.value = ''; };
 ui.clearBtn.onclick = clearAll;
-function clearAll(){Object.values(state.assetUrls).forEach(URL.revokeObjectURL);Object.values(state.activeAssetMap).forEach(URL.revokeObjectURL);Object.assign(state,{files:{},assetUrls:{},currentPath:null,activeAssetMap:{}});renderTabs();renderTree();editor.setValue('// Editor kosong');ui.previewIframe.src='about:blank'}
-async function openFile(path){if(!path||!state.files[path]||path===state.currentPath||isBinaryFile(path))return;state.currentPath=path;editor.setValue(state.files[path].text??'');const getMode=p=>{if(p.endsWith('.css'))return'css';if(p.endsWith('.js'))return'javascript';return'htmlmixed'};editor.setOption('mode',getMode(path));renderTabs();setTimeout(()=>editor.refresh(),50)}
-function renderTabs(){ui.editorTabsContainer.innerHTML='';const codeFiles=Object.keys(state.files).filter(isCodeFile).sort((a,b)=>{const o={html:1,css:2,js:3};return(o[a.split('.').pop()]||99)-(o[b.split('.').pop()]||99)});codeFiles.forEach(path=>{const btn=document.createElement('button');btn.className=`btn ${path===state.currentPath?'active':''}`;btn.onclick=()=>openFile(path);const ext=path.split('.').pop();let i='fa-regular fa-file-code';if(ext==='html')i='fa-brands fa-html5';if(ext==='css')i='fa-brands fa-css3-alt';if(ext==='js')i='fa-brands fa-js';const filename=path.split('/').pop();btn.innerHTML=`<i class="${i}"></i> <span class="filename">${filename}</span> <span class="close-btn">&times;</span>`;btn.querySelector('.close-btn').onclick=(e)=>{e.stopPropagation();console.log("Fungsi close belum diimplementasikan untuk:",path)};ui.editorTabsContainer.appendChild(btn)})}
-function renderTree(){const filePaths=Object.keys(state.files);ui.treeContainer.innerHTML=filePaths.length?'':'(kosong)';if(!filePaths.length)return;const tree={};filePaths.forEach(path=>{let current=tree;path.split('/').forEach((part,i,arr)=>{current[part]=current[part]||{};if(i===arr.length-1)current[part].__path=path;current=current[part]})});function createHtml(node){const ul=document.createElement('ul');const keys=Object.keys(node).sort((a,b)=>(node[a].__path?1:-1)-(node[b].__path?1:-1)||a.localeCompare(b));keys.forEach(key=>{if(key==='__path')return;const li=document.createElement('li');const data=node[key];if(data.__path){const ext=key.split('.').pop();let icon=isBinaryFile(key)?'fa-image':'fa-file-code';li.innerHTML=`<div class="tree-item" data-path="${data.__path}"><i class="fa-regular ${icon}"></i> <span>${key}</span></div>`;li.querySelector('.tree-item').onclick=()=>{openFile(data.__path)}}else{const folderDiv=document.createElement('div');folderDiv.className='tree-item';folderDiv.innerHTML=`<span class="folder-toggle"><i class="fa-solid fa-chevron-right"></i></span><span>${key}</span>`;const nestedUl=createHtml(data);nestedUl.classList.add('nested','collapsed');li.append(folderDiv,nestedUl);folderDiv.onclick=()=>{folderDiv.querySelector('.folder-toggle').classList.toggle('expanded');nestedUl.classList.toggle('collapsed')}}ul.appendChild(li)});return ul}ui.treeContainer.appendChild(createHtml(tree))}
-function ensureDefaultFiles(){if(Object.keys(state.files).length>0)return;state.files['index.html']={text:'<h1>Selamat Datang!</h1>\n<p>Klik <i class="fa-solid fa-play"></i> untuk preview.</p>\n<link rel="stylesheet" href="style.css">\n<script src="script.js"></script>',isBinary:false};state.files['style.css']={text:'body { font-family: sans-serif; text-align: center; margin-top: 50px; background-color: #f0f8ff; }',isBinary:false};state.files['script.js']={text:'console.log("Selamat datang!");',isBinary:false}}
-(async function init(){await postImportSetup()})();
+
+// === PERBAIKAN KUNCI: EVENT LISTENER UNTUK REAL-TIME UPDATE ===
+editor.on('change', debounce(() => {
+    // 1. Simpan teks terbaru dari editor ke dalam 'state'
+    if (state.currentPath && state.files[state.currentPath]) {
+        state.files[state.currentPath].text = editor.getValue();
+    }
+    // 2. Jalankan preview, yang sekarang akan membaca teks yang sudah diperbarui
+    runPreview();
+}, 500));
+
+
+// === FUNGSI UTILITAS LAINNYA ===
+function clearAll(){
+    Object.values(state.assetUrls).forEach(URL.revokeObjectURL);
+    Object.values(state.activeAssetMap).forEach(URL.revokeObjectURL);
+    Object.assign(state, {files:{}, assetUrls:{}, currentPath:null, activeAssetMap:{}});
+    renderTabs(); renderTree(); editor.setValue('// Editor kosong'); ui.previewIframe.src = 'about:blank';
+}
+async function openFile(path) {
+    if(!path || !state.files[path] || path === state.currentPath || isBinaryFile(path)) return;
+    state.currentPath = path;
+    editor.setValue(state.files[path].text ?? '');
+    const getMode = p => { if(p.endsWith('.css')) return 'css'; if(p.endsWith('.js')) return 'javascript'; return 'htmlmixed'; };
+    editor.setOption('mode', getMode(path));
+    renderTabs();
+    setTimeout(()=>editor.refresh(), 50);
+}
+function renderTabs() {
+    ui.editorTabsContainer.innerHTML = '';
+    const codeFiles=Object.keys(state.files).filter(isCodeFile).sort((a,b)=>{const o={html:1,css:2,js:3};return(o[a.split('.').pop()]||99)-(o[b.split('.').pop()]||99)});
+    codeFiles.forEach(path=>{const btn=document.createElement('button');btn.className=`btn ${path===state.currentPath?'active':''}`;btn.onclick=()=>openFile(path);const ext=path.split('.').pop();let i='fa-regular fa-file-code';if(ext==='html')i='fa-brands fa-html5';if(ext==='css')i='fa-brands fa-css3-alt';if(ext==='js')i='fa-brands fa-js';const filename=path.split('/').pop();btn.innerHTML=`<i class="${i}"></i> <span class="filename">${filename}</span> <span class="close-btn">&times;</span>`;btn.querySelector('.close-btn').onclick=(e)=>{e.stopPropagation();console.log("Fungsi close belum diimplementasikan untuk:",path)};ui.editorTabsContainer.appendChild(btn)})
+}
+function renderTree() {
+    const filePaths = Object.keys(state.files);
+    ui.treeContainer.innerHTML = filePaths.length ? '' : '(kosong)';
+    if (!filePaths.length) return;
+    const tree = {};
+    filePaths.forEach(path => { let current = tree; path.split('/').forEach((part, i, arr) => { current[part] = current[part] || {}; if (i === arr.length - 1) current[part].__path = path; current = current[part]; }); });
+    function createHtml(node) {
+        const ul = document.createElement('ul');
+        const keys = Object.keys(node).sort((a,b) => (node[a].__path ? 1 : -1) - (node[b].__path ? 1 : -1) || a.localeCompare(b));
+        keys.forEach(key => {
+            if (key === '__path') return;
+            const li = document.createElement('li');
+            const data = node[key];
+            if (data.__path) {
+                const ext = key.split('.').pop(); let icon = isBinaryFile(key) ? 'fa-image' : 'fa-file-code';
+                li.innerHTML = `<div class="tree-item" data-path="${data.__path}"><i class="fa-regular ${icon}"></i> <span>${key}</span></div>`;
+                li.querySelector('.tree-item').onclick = () => { openFile(data.__path); };
+            } else {
+                const folderDiv = document.createElement('div'); folderDiv.className = 'tree-item';
+                folderDiv.innerHTML = `<span class="folder-toggle"><i class="fa-solid fa-chevron-right"></i></span><span>${key}</span>`;
+                const nestedUl = createHtml(data); nestedUl.classList.add('nested', 'collapsed');
+                li.append(folderDiv, nestedUl);
+                folderDiv.onclick = () => { folderDiv.querySelector('.folder-toggle').classList.toggle('expanded'); nestedUl.classList.toggle('collapsed'); };
+            }
+            ul.appendChild(li);
+        });
+        return ul;
+    }
+    ui.treeContainer.appendChild(createHtml(tree));
+}
+function ensureDefaultFiles() {
+    if (Object.keys(state.files).length > 0) return;
+    state.files['index.html'] = { text: '<h1>Selamat Datang!</h1>\n<p>Klik <i class="fa-solid fa-play"></i> untuk preview.</p>\n<link rel="stylesheet" href="style.css">\n<script src="script.js"></script>', isBinary: false };
+    state.files['style.css'] = { text: 'body { font-family: sans-serif; text-align: center; margin-top: 50px; background-color: #f0f8ff; }', isBinary: false };
+    state.files['script.js'] = { text: 'console.log("Selamat datang!");', isBinary: false };
+}
+
+(async function init() {
+  await postImportSetup();
+})();
