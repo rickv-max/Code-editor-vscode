@@ -1,4 +1,4 @@
-/* === CSS FINAL DENGAN RESET LAYOUT TOTAL === */
+/* === CSS FINAL DENGAN PERBAIKAN LAYOUT DEFINITIF === */
 :root {
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --activity-bar-bg: #333;
@@ -12,90 +12,82 @@
   --tab-inactive-bg: #2d2d2d;
 }
 * { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
 
-/* === KONTENER BERALIH LAYAR (TETAP SAMA) === */
-.view-container { width: 100%; height: 100%; position: relative; }
+/* === PERBAIKAN 1: MEMASTIKAN RANTAI TINGGI 100% TIDAK PUTUS === */
+html, body, .view-container, #editor-view {
+    height: 100%;
+}
+body { margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
+
+/* === KONTENER BERALIH LAYAR === */
+.view-container { position: relative; }
 .app-view { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
 #editor-view { display: flex; flex-direction: row; opacity: 1; transform: scale(1); z-index: 10; }
 #preview-view { display: none; flex-direction: column; opacity: 0; transform: scale(1.05); pointer-events: none; z-index: 5; background-color: var(--preview-bg); }
 body.show-preview #editor-view { opacity: 0; transform: scale(0.95); pointer-events: none; }
 body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; }
 
-/* === LAYOUT EDITOR YANG DIPERBAIKI SECARA FUNDAMENTAL === */
-.activity-bar { width: 48px; flex-shrink: 0; background: var(--activity-bar-bg); /* ... styling lainnya ... */ }
-.sidebar { width: 260px; flex-shrink: 0; transition: width .18s ease; background: var(--sidebar-bg); /* ... styling lainnya ... */ }
+/* === LAYOUT EDITOR YANG BENAR === */
+.activity-bar { width: 48px; flex-shrink: 0; background: var(--activity-bar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; }
+.sidebar { width: 260px; flex-shrink: 0; transition: width .18s ease; background: var(--sidebar-bg); display: flex; flex-direction: column; }
 .sidebar.collapsed { width: 0; }
 .workbench {
-  flex-grow: 1; /* PENTING: Mengisi sisa ruang */
-  display: flex;
-  flex-direction: column;
-  min-width: 0; /* Mencegah overflow */
+    flex-grow: 1; /* Mengisi sisa lebar */
+    display: flex;
+    flex-direction: column; /* Tumpuk tab di atas area kode */
+    min-width: 0;
+    height: 100%; /* Ambil tinggi penuh dari induknya */
 }
-.editor-area { flex-grow: 1; display: flex; flex-direction: column; min-height: 0; background-color: var(--editor-bg); }
+.editor-area {
+    flex-grow: 1; /* Mengisi sisa tinggi */
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Penting untuk flexbox vertikal */
+}
 .editor-wrap { flex-grow: 1; position: relative; }
 .cm-container { position: absolute; inset: 0; }
 .CodeMirror, .CodeMirror-scroll { background-color: var(--editor-bg) !important; }
 
-/* === DESAIN TAB (TIDAK BERUBAH) === */
+/* === Desain Lainnya (Tidak berubah) === */
+.sidebar-header { padding: 10px 12px; font-size: 12px; color: var(--text-secondary); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.file-tree { flex: 1; overflow: auto; padding: 6px 8px; font-size: 14px; }
+.icon-btn { color: var(--text-secondary); background: none; border: none; font-size: 18px; padding: 8px; cursor: pointer; width: 100%; }
+.icon-btn:hover { color: var(--text-primary); }
 .editor-tabs { display: flex; background: var(--tab-inactive-bg); flex-shrink: 0; overflow-x: auto; align-items: flex-end; padding: 0 4px; border-top: 1px solid var(--border-color); }
-.editor-tabs .btn { /* ...styling tab sama... */ }
-
-/* === LAYOUT PREVIEW YANG DIPERBAIKI SECARA FUNDAMENTAL === */
-.preview-header { flex-shrink: 0; /* ... styling lainnya ... */ }
-.preview-content {
-  flex-grow: 1; /* Mengisi sisa ruang vertikal */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem; /* Beri ruang bernapas */
-  overflow: auto; /* Bisa di-scroll jika perlu */
-}
-.device-frame {
-  position: relative;
-  transition: all 0.4s ease;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-}
-.device-frame iframe { display: block; width: 100%; height: 100%; border: none; background: white; }
-
-/* BINGKAI DESKTOP RESPONSIF */
-#preview-view.view-desktop .device-frame {
-  width: 90vw; /* Lebar 90% dari viewport */
-  height: calc(90vw * 0.5625); /* Rasio 16:9 */
-  max-width: 1600px; /* Batas maksimum */
-  max-height: 90vh; /* Batas tinggi 90% dari viewport */
-  min-height: 400px;
-  background: #111; border: 12px solid #222; border-radius: 10px; padding: 1.5rem; padding-bottom: 3.5rem;
-}
-#preview-view.view-desktop .device-frame::after { content: ''; position: absolute; bottom: -2rem; left: 50%; transform: translateX(-50%); width: 20%; height: 2rem; background: #222; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-
-/* BINGKAI PONSEL RESPONSIF */
-#preview-view.view-mobile .device-frame {
-  width: 375px;
-  height: 812px;
-  flex-shrink: 0; /* Jangan menyusut */
-  background: #111; border: 10px solid #1c1c1c; border-radius: 54px; padding: 10px;
-}
-#preview-view.view-mobile .device-frame iframe { border-radius: 44px; }
-#preview-view.view-mobile .device-frame::before { content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 55%; height: 28px; background: #111; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 10; }
-
-/* Menyatukan sisa styling yang tidak berubah untuk keringkasan */
-.activity-bar, .sidebar {display: flex; flex-direction: column;}
-.activity-bar .actions-group {display: flex; flex-direction: column; gap: 10px; width: 100%;}
-.activity-bar {justify-content: space-between; align-items: center; padding: 10px 0;}
-.sidebar-header {padding: 10px 12px; font-size: 12px; color: var(--text-secondary); text-transform: uppercase; display: flex; align-items: center; gap: 8px;}
-.file-tree {flex: 1; overflow: auto; padding: 6px 8px; font-size: 14px;}
-.icon-btn {color: var(--text-secondary); background: none; border: none; font-size: 18px; padding: 8px; cursor: pointer; width: 100%;}
-.icon-btn:hover {color: var(--text-primary);}
 .editor-tabs .btn { background: var(--tab-inactive-bg); color: var(--text-secondary); border: none; border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 8px 12px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; margin-top: 5px; border-top-left-radius: 4px; border-top-right-radius: 4px; }
 .editor-tabs .btn:first-child { border-left: 1px solid var(--border-color); }
 .editor-tabs .btn.active { background: var(--editor-bg); color: var(--text-primary); border-top-color: var(--accent-blue); border-top-width: 2px; border-bottom: 1px solid var(--editor-bg); margin-top: 3px; }
 .editor-tabs .btn .filename { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
 .editor-tabs .btn .close-btn { font-weight: bold; cursor: pointer; padding: 0 4px; color: var(--text-secondary); font-size: 16px; line-height: 1; border-radius: 3px; margin-left: 8px; opacity: .5; }
 .editor-tabs .btn:hover .close-btn { opacity: 1; background: rgba(255, 255, 255, .1); }
-.preview-header { padding: 8px 16px; background-color: white; border-bottom: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+/* === LAYOUT PREVIEW YANG BENAR === */
+.preview-header { flex-shrink: 0; padding: 8px 16px; background-color: white; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .btn-back-to-editor { background: #333; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .preview-header .view-mode-controls { display: flex; border: 1px solid #ccc; border-radius: 5px; overflow: hidden; }
 .btn-view-mode { background: white; border: none; color: #555; padding: 6px 12px; cursor: pointer; font-size: 14px; }
 .btn-view-mode:not(:last-child) { border-right: 1px solid #ccc; }
 .btn-view-mode.active { background-color: var(--accent-blue); color: white; }
+.preview-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; overflow: auto; }
+.device-frame { position: relative; transition: all 0.4s ease; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+.device-frame iframe { display: block; width: 100%; height: 100%; border: none; background: white; }
+
+/* BINGKAI DESKTOP RESPONSIF */
+#preview-view.view-desktop .device-frame {
+    width: 90vw;
+    height: calc(90vw * 9 / 16); /* Paksa rasio 16:9 */
+    max-width: 1600px;
+    max-height: 90vh;
+    background: #111; border: 12px solid #222; border-radius: 10px; padding: 1.5rem; padding-bottom: 3.5rem;
+}
+#preview-view.view-desktop .device-frame::after { content: ''; position: absolute; bottom: -2rem; left: 50%; transform: translateX(-50%); width: 20%; height: 2rem; background: #222; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+
+/* BINGKAI PONSEL RESPONSIF */
+#preview-view.view-mobile .device-frame {
+    width: 375px;
+    height: 812px;
+    flex-shrink: 0;
+    background: #111; border: 10px solid #1c1c1c; border-radius: 54px; padding: 10px;
+}
+#preview-view.view-mobile .device-frame iframe { border-radius: 44px; }
+#preview-view.view-mobile .device-frame::before { content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 55%; height: 28px; background: #111; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 10; }
