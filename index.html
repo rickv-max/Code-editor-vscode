@@ -3,14 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Editor & Dev Preview — Final</title>
-
+    <title>Editor & Dev Preview</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css"/>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="">
+<body>
 
 <div class="view-container">
   <div id="editor-view" class="app-view">
@@ -26,7 +25,10 @@
       </div>
     </aside>
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header"><span>Explorer</span><button id="collapse-sidebar" class="icon-btn" title="Toggle" style="margin-left:auto"><i class="fa-solid fa-chevron-left"></i></button></div>
+      <div class="sidebar-header">
+        <span>Explorer</span>
+        <button id="collapse-sidebar" class="icon-btn" title="Toggle"><i class="fa-solid fa-chevron-left"></i></button>
+      </div>
       <div class="file-tree" id="file-tree">(kosong)</div>
     </aside>
     <div class="workbench">
@@ -41,7 +43,7 @@
   
   <div id="preview-view" class="app-view view-desktop">
     <div class="preview-header">
-      <button id="back-to-editor-btn" class="btn-back-to-editor"><i class="fa-solid fa-chevron-left"></i> Kembali ke Editor</button>
+      <button id="back-to-editor-btn" class="btn-back-to-editor"><i class="fa-solid fa-chevron-left"></i> Kembali</button>
       <div class="view-mode-controls">
         <button id="desktop-view-btn" class="btn-view-mode active" title="Desktop View"><i class="fa-solid fa-desktop"></i></button>
         <button id="mobile-view-btn" class="btn-view-mode" title="Mobile View"><i class="fa-solid fa-mobile-screen-button"></i></button>
@@ -50,10 +52,13 @@
     <div class="preview-content">
       <div class="device-frame">
           <div class="browser-bar">
-              <div class="dots"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span></div>
+              <div class="dots">
+                <span class="dot" style="background:#ff5f56;"></span>
+                <span class="dot" style="background:#ffbd2e;"></span>
+                <span class="dot" style="background:#27c93f;"></span>
+              </div>
               <div class="address-bar">localhost:3000</div>
           </div>
-          <!-- PERBAIKAN STRUKTURAL: iframe dibungkus di dalam .device-screen -->
           <div class="device-screen">
             <iframe id="preview-iframe" class="preview"></iframe>
           </div>
