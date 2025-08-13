@@ -50,17 +50,13 @@
     <div class="preview-content">
       <div class="device-frame">
           <div class="browser-bar">
-              <div class="dots">
-                  <span class="dot" style="background:#ff5f56;"></span>
-                  <span class="dot" style="background:#ffbd2e;"></span>
-                  <span class="dot" style="background:#27c93f;"></span>
-              </div>
-              <!-- PERUBAHAN KUNCI: Menambahkan URL Bar Palsu -->
-              <div class="address-bar">
-                  localhost:3000
-              </div>
+              <div class="dots"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span></div>
+              <div class="address-bar">localhost:3000</div>
           </div>
-          <iframe id="preview-iframe" class="preview"></iframe>
+          <!-- PERBAIKAN STRUKTURAL: iframe dibungkus di dalam .device-screen -->
+          <div class="device-screen">
+            <iframe id="preview-iframe" class="preview"></iframe>
+          </div>
       </div>
     </div>
   </div>
