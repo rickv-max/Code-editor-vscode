@@ -3,7 +3,7 @@
   --activity-bar-bg: #333;
   --sidebar-bg: #252526;
   --editor-bg: #1e1e1e;
-  --preview-bg: #f4f6f9;
+  --preview-bg: #e9eef2; /* Latar belakang lebih lembut */
   --border-color: #3e3e42;
   --text-primary: #cccccc;
   --text-secondary: #808080;
@@ -11,22 +11,17 @@
   --tab-inactive-bg: #2d2d2d;
 }
 * { box-sizing: border-box; }
+html, body { height: 100vh; margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
 
-/* 1. PERBAIKAN PANEL KODE: Memastikan Rantai Tinggi 100% */
-html, body, .view-container, #editor-view {
-    height: 100vh;
-}
-body { margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
-
-/* KONTENER BERALIH LAYAR */
-.view-container { position: relative; }
+/* LAYOUT KONTENER UTAMA (STABIL) */
+.view-container { width: 100%; height: 100%; position: relative; }
 .app-view { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
 #editor-view { display: flex; opacity: 1; transform: scale(1); z-index: 10; }
 #preview-view { display: none; flex-direction: column; opacity: 0; transform: scale(1.05); pointer-events: none; z-index: 5; background-color: var(--preview-bg); }
 body.show-preview #editor-view { opacity: 0; transform: scale(0.95); pointer-events: none; }
 body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; }
 
-/* LAYOUT EDITOR FULL */
+/* LAYOUT EDITOR (STABIL) */
 .activity-bar { width: 48px; flex-shrink: 0; background: var(--activity-bar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; }
 .sidebar { width: 260px; flex-shrink: 0; transition: width .18s ease; background: var(--sidebar-bg); display: flex; flex-direction: column; }
 .sidebar.collapsed { width: 0; }
@@ -35,8 +30,7 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-wrap { flex-grow: 1; position: relative; background-color: var(--editor-bg); }
 .cm-container { position: absolute; inset: 0; }
 .CodeMirror { height: 100% !important; background: transparent !important; }
-
-/* Styling lain yang tidak berubah */
+/* ... (Styling lain yang tidak berubah: .icon-btn, .sidebar-header, .file-tree, .tree-item, .folder-toggle, .editor-tabs) ... */
 .icon-btn{color:var(--text-secondary);background:none;border:none;font-size:18px;padding:8px;cursor:pointer;width:100%}.icon-btn:hover{color:var(--text-primary)}
 .sidebar-header{padding:10px 12px;font-size:12px;color:var(--text-secondary);text-transform:uppercase;display:flex;align-items:center;gap:8px}
 .file-tree{flex:1;overflow:auto;padding:6px 8px;font-size:14px}
@@ -51,57 +45,75 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-tabs .btn .close-btn{font-weight:bold;cursor:pointer;padding:0 4px;color:var(--text-secondary);font-size:16px;line-height:1;border-radius:3px;margin-left:8px;opacity:.5}
 .editor-tabs .btn:hover .close-btn{opacity:1;background:rgba(255,255,255,.1)}
 
-/* 2. PERBAIKAN: PREVIEW RESPONSIF TOTAL */
+
+/* === PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL === */
 .preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
 .btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
 .preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
-.device-frame {
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    transition: all 0.4s ease;
-}
-.device-frame iframe{ flex-grow: 1; border: none; background: white; }
+.device-frame { display: flex; flex-direction: column; transition: all 0.4s ease; }
+.device-frame iframe{ flex-grow: 1; border: none; }
 
 /* BINGKAI DESKTOP GAYA "LOCALHOST" */
 #preview-view.view-desktop .device-frame {
     width: 90vw;
     max-width: 1400px;
-    height: 85vh; /* Tinggi 85% dari layar */
+    aspect-ratio: 16 / 9;
+    max-height: 88vh;
     border-radius: 8px;
     border: 1px solid #ccc;
     background-color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 .browser-bar { flex-shrink: 0; padding: 8px; background-color: #e8e6e8; border-bottom: 1px solid #ccc; }
 .dots { display: flex; gap: 6px; }
 .dot { width: 12px; height: 12px; border-radius: 50%; }
 
-/* BINGKAI PONSEL GAYA FISIK - RESPONSIF TOTAL */
+/* BINGKAI IPHONE 3D & RESPONSIF */
 #preview-view.view-mobile .device-frame {
-    width: 375px; /* Lebar ideal */
-    max-width: 95%; /* TIDAK AKAN PERNAH meluap dari layar */
-    aspect-ratio: 375 / 812; /* PAKSA rasio agar tidak penyet */
-    max-height: 95vh; /* Jaga agar tidak terlalu tinggi */
-    border: 12px solid #1c1c1c;
-    border-radius: 52px;
-    background-color: #111;
-    padding: 0; /* Padding akan dikontrol oleh border */
-    position: relative; /* Wajib untuk poni */
+    --iphone-width: 320px; /* Ukuran dasar yang lebih kecil & aman */
+    width: var(--iphone-width);
+    max-width: 90vw; /* Tidak akan meluap dari layar */
+    aspect-ratio: 375 / 812; /* Rasio iPhone X */
+    max-height: 90vh;
+    
+    position: relative;
+    border-radius: 50px;
+    background: #111;
+    padding: 12px; /* Jarak antara bingkai dan layar */
+    box-shadow: 
+        inset 0 0 4px rgba(255, 255, 255, 0.2), /* Kilau dalam */
+        0 0 0 2px #333, /* Garis luar tipis */
+        0 25px 40px -10px rgba(0,0,0,0.4); /* Bayangan 3D */
 }
 #preview-view.view-mobile .browser-bar { display: none; }
-#preview-view.view-mobile iframe { border-radius: 40px; /* Sudut dalam harus lebih kecil dari bingkai */ }
+#preview-view.view-mobile iframe { border-radius: 38px; }
 
-/* PERBAIKAN PONI IPHONE RUSAK */
+/* PONI IPHONE 3D */
 #preview-view.view-mobile .device-frame::before {
     content: '';
     position: absolute;
-    top: 0px; /* Menempel di atas bingkai */
+    top: 12px; /* Sama dengan padding */
     left: 50%;
     transform: translateX(-50%);
-    width: 50%;
-    height: 30px; /* Tinggi poni */
-    background: #1c1c1c; /* Sama dengan warna border */
+    width: 45%;
+    height: 25px;
+    background: #111;
     border-bottom-left-radius: 13px;
     border-bottom-right-radius: 13px;
-    z-index: 2; /* Di atas iframe */
+    z-index: 2;
 }
+
+/* === TRIK KONTEN RESPONSIF DALAM IFRAME === */
+/* Ini mensimulasikan media query di dalam iframe, membuat konten beradaptasi */
+/* Untuk Desktop */
+#preview-view.view-desktop iframe {
+    --iframe-width: 90vw; /* Sama dengan lebar bingkai */
+    max-width: 1400px;
+}
+/* Untuk Mobile */
+#preview-view.view-mobile iframe {
+    --iframe-width: 320px; /* Sama dengan lebar ideal iPhone */
+    max-width: 90vw;
+}
+/* Kode ini disuntikkan ke dalam iframe untuk membuat konten responsif */
+/* Contoh: h1 { font-size: calc(var(--iframe-width) * 0.1); } */
