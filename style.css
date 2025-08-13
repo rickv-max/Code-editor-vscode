@@ -160,88 +160,63 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
   margin-top: 3px;
 }
 
-/* PREVIEW */
-.preview-header {
-  flex-shrink: 0;
-  padding: 8px 16px;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-bottom: 1px solid #ddd;
-}
-.btn-back-to-editor {
-  background: #333;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-}
-.preview-content {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  overflow: auto;
-}
+/* PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL (VERSI FINAL) */
+.preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
+.btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
+.preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
+.device-frame { display: flex; flex-direction: column; transition: all 0.4s ease; }
+.device-screen { flex-grow: 1; } /* PERBAIKAN: .device-screen akan mengisi sisa ruang */
+.device-frame iframe{ width: 100%; height: 100%; border: none; }
 
-/* Desktop Frame */
+/* BINGKAI DESKTOP GAYA "LOCALHOST" (STABIL) */
 #preview-view.view-desktop .device-frame {
-  width: 90vw;
-  max-width: 1400px;
-  aspect-ratio: 16 / 9;
-  max-height: 88vh;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background-color: white;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  overflow: hidden;
+    width: 90vw; max-width: 1400px; aspect-ratio: 16 / 9; max-height: 88vh;
+    border-radius: 8px; border: 1px solid #ccc; background-color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
 }
-.browser-bar {
-  padding: 8px;
-  background-color: #e8e6e8;
-  border-bottom: 1px solid #ccc;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.address-bar {
-  flex-grow: 1;
-  background-color: white;
-  color: #555;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-family: monospace;
-}
+.browser-bar { flex-shrink: 0; padding: 8px; background-color: #e8e6e8; border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 8px; }
+.dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.address-bar { flex-grow: 1; background-color: white; color: #555; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid #ddd; }
+#preview-view.view-desktop .device-screen { overflow: hidden; }
 
-/* Mobile Frame */
+/* === PERBAIKAN TOTAL: BINGKAI IPHONE 3D & RESPONSIF === */
 #preview-view.view-mobile .device-frame {
-  width: 375px;
-  height: 700px;
-  border-radius: 50px;
-  background: #1e1e1e;
-  padding: 12px;
-  position: relative;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    --iphone-h: 700px;
+    --iphone-w: calc(var(--iphone-h) * (375 / 812));
+    width: var(--iphone-w); height: var(--iphone-h);
+    max-width: 90vw; max-height: 90vh;
+    aspect-ratio: 375 / 812;
+    
+    position: relative;
+    border-radius: 50px;
+    background: #1e1e1e;
+    padding: 12px; /* Jarak antara bingkai dan layar */
+    
+    border: 2px solid #444;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0,0,0,0.3), 0 20px 30px rgba(0,0,0,0.2);
 }
+#preview-view.view-mobile .browser-bar { display: none; }
+/* PERBAIKAN: iframe sekarang di dalam .device-screen */
 #preview-view.view-mobile .device-screen {
-  border-radius: 38px;
-  overflow: hidden;
-  background: #000;
+    border-radius: 38px;
+    overflow: hidden; /* SANGAT PENTING: Memotong iframe agar pas di dalam bingkai */
+    background: #000; /* Latar belakang hitam jika iframe gagal */
 }
+#preview-view.view-mobile iframe { border-radius: 0; } /* iframe tidak perlu radius lagi */
+
+/* PONI YANG DIPERBAIKI SECARA FUNDAMENTAL */
 #preview-view.view-mobile .device-frame::before {
-  content: '';
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 45%;
-  height: 25px;
-  background: #1e1e1e;
-  border-bottom-left-radius: 13px;
-  border-bottom-right-radius: 13px;
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45%;
+    height: 25px;
+    background: #1e1e1e;
+    border-bottom-left-radius: 13px;
+    border-bottom-right-radius: 13px;
+    z-index: 2;
 }
