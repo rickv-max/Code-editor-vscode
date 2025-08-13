@@ -3,21 +3,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Editor & Live Preview — Final</title>
+    <title>Editor & Dev Preview — Final</title>
 
-    <!-- Pihak Ketiga -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css"/>
-
-    <!-- Menghubungkan ke File CSS Anda -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="">
 
 <div class="view-container">
-
-  <!-- LAYAR 1: TAMPILAN EDITOR -->
   <div id="editor-view" class="app-view">
     <aside class="activity-bar">
       <div class="actions-group">
@@ -30,12 +25,10 @@
         <button id="clear-btn" class="icon-btn" title="Clear All"><i class="fa-solid fa-trash"></i></button>
       </div>
     </aside>
-
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header"><span>Explorer</span><button id="collapse-sidebar" class="icon-btn" title="Toggle" style="margin-left:auto"><i class="fa-solid fa-chevron-left"></i></button></div>
       <div class="file-tree" id="file-tree">(kosong)</div>
     </aside>
-
     <div class="workbench">
       <main class="editor-area">
         <div class="editor-tabs" id="editor-tabs"></div>
@@ -45,8 +38,7 @@
       </main>
     </div>
   </div>
-
-  <!-- LAYAR 2: TAMPILAN PREVIEW -->
+  
   <div id="preview-view" class="app-view view-desktop">
     <div class="preview-header">
       <button id="back-to-editor-btn" class="btn-back-to-editor"><i class="fa-solid fa-chevron-left"></i> Kembali ke Editor</button>
@@ -56,27 +48,30 @@
       </div>
     </div>
     <div class="preview-content">
+      <!-- Bingkai akan dibuat dengan CSS -->
       <div class="device-frame">
-        <iframe id="preview-iframe" class="preview"></iframe>
+          <div class="browser-bar">
+              <div class="dots">
+                  <span class="dot" style="background:#ff5f56;"></span>
+                  <span class="dot" style="background:#ffbd2e;"></span>
+                  <span class="dot" style="background:#27c93f;"></span>
+              </div>
+          </div>
+          <iframe id="preview-iframe" class="preview"></iframe>
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- Input file tersembunyi -->
 <input id="folder-input" type="file" webkitdirectory multiple hidden />
 <input id="zip-input" type="file" accept=".zip" hidden />
 
-<!-- Pihak Ketiga (JS) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
-
-<!-- Menghubungkan ke File JS Anda Sendiri di Akhir Body -->
 <script src="script.js"></script>
 
 </body>
