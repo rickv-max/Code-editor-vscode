@@ -1,5 +1,4 @@
 const ui = {
-    body: document.body,const ui = {
     body: document.body,
     sidebar: document.getElementById('sidebar'),
     toggleExplorerBtn: document.getElementById('toggle-explorer'),
@@ -14,8 +13,9 @@ const ui = {
     previewIframe: document.getElementById('preview-iframe'),
     backToEditorBtn: document.getElementById('back-to-editor-btn'),
     desktopViewBtn: document.getElementById('desktop-view-btn'),
-    mobileViewBtn: document.getElementById('mobile-view-btn'),
-};
+    mobileViewBtn: document.getElementById('mobile-view-btn'), // ✅ ada koma
+}; // ✅ objek diakhiri dengan titik koma
+
 const state = { files: {}, assetUrls: {}, currentPath: null, activeAssetMap: {} };
 const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {mode: 'htmlmixed', theme: 'dracula', lineNumbers: true, autoCloseBrackets: true, viewportMargin: Infinity});
 
