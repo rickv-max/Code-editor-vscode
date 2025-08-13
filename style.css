@@ -46,7 +46,7 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-tabs .btn:hover .close-btn{opacity:1;background:rgba(255,255,255,.1)}
 
 
-/* === PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL (VERSI FINAL) === */
+/* PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL (VERSI FINAL) */
 .preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
 .btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
 .preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
@@ -64,30 +64,29 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .dot { width: 12px; height: 12px; border-radius: 50%; }
 .address-bar { flex-grow: 1; background-color: white; color: #555; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid #ddd; }
 
-/* === PERBAIKAN TOTAL: BINGKAI IPHONE 3D & RESPONSIF === */
+/* BINGKAI IPHONE 3D & RESPONSIF TOTAL (VERSI FINAL) */
 #preview-view.view-mobile .device-frame {
-    /* Ukuran dasar yang proporsional dan lebih kecil */
-    --iphone-h: 700px;
-    --iphone-w: calc(var(--iphone-h) * (375 / 812)); /* Menjaga rasio iPhone X */
+    --iphone-h: 667px; /* Ukuran dasar iPhone 8, lebih kecil & proporsional */
+    --iphone-w: 375px;
     
     width: var(--iphone-w);
     height: var(--iphone-h);
     
-    /* Batasan agar tidak meluap di layar manapun */
     max-width: 90vw;
+    /* Trik agar tinggi menyesuaikan jika lebar menyusut */
+    aspect-ratio: 375 / 667;
     max-height: 90vh;
     
     position: relative;
     border-radius: 50px;
-    background: #1e1e1e; /* Warna dasar lebih gelap */
+    background: #1e1e1e;
     padding: 12px;
     
-    /* Efek 3D berlapis */
     border: 2px solid #444;
     box-shadow: 
-        inset 0 0 5px rgba(0, 0, 0, 0.5), /* Bayangan dalam */
-        0 4px 8px rgba(0,0,0,0.3),  /* Bayangan bawah dekat */
-        0 20px 30px rgba(0,0,0,0.2); /* Bayangan jauh */
+        inset 0 0 5px rgba(0, 0, 0, 0.5),
+        0 4px 8px rgba(0,0,0,0.3),
+        0 20px 30px rgba(0,0,0,0.2);
 }
 #preview-view.view-mobile .browser-bar { display: none; }
 #preview-view.view-mobile iframe { border-radius: 38px; }
@@ -96,13 +95,13 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 #preview-view.view-mobile .device-frame::before {
     content: '';
     position: absolute;
-    top: 12px; /* Menempel di dalam padding */
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
     width: 45%;
     height: 25px;
-    background: #1e1e1e; /* Sama dengan warna bingkai */
+    background: #1e1e1e;
     border-bottom-left-radius: 13px;
     border-bottom-right-radius: 13px;
-    z-index: 2; /* Di atas iframe */
+    z-index: 2;
 }
