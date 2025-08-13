@@ -10,99 +10,238 @@
   --accent-blue: #007acc;
   --tab-inactive-bg: #2d2d2d;
 }
-* { box-sizing: border-box; }
-html, body { height: 100vh; margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
 
-/* LAYOUT KONTENER UTAMA (STABIL) */
-.view-container { width: 100%; height: 100%; position: relative; }
-.app-view { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
+* { box-sizing: border-box; }
+html, body {
+  height: 100vh;
+  margin: 0;
+  font-family: var(--font-family);
+  background: var(--editor-bg);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* LAYOUT UTAMA */
+.view-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  position: relative;
+}
+.app-view {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
 #editor-view { display: flex; opacity: 1; transform: scale(1); z-index: 10; }
 #preview-view { display: none; flex-direction: column; opacity: 0; transform: scale(1.05); pointer-events: none; z-index: 5; background-color: var(--preview-bg); }
 body.show-preview #editor-view { opacity: 0; transform: scale(0.95); pointer-events: none; }
 body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; }
 
-/* LAYOUT EDITOR FULL (STABIL) */
-.activity-bar { width: 48px; flex-shrink: 0; background: var(--activity-bar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; }
-.sidebar { width: 260px; flex-shrink: 0; transition: width .18s ease; background: var(--sidebar-bg); display: flex; flex-direction: column; }
+/* ACTIVITY BAR */
+.activity-bar {
+  width: 48px;
+  background: var(--activity-bar-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+.actions-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.icon-btn {
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  font-size: 18px;
+  padding: 8px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+.icon-btn:hover { color: var(--text-primary); }
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  transition: width .18s ease;
+}
 .sidebar.collapsed { width: 0; }
-.workbench { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
-.editor-area { flex-grow: 1; display: flex; flex-direction: column; min-height: 0; }
-.editor-wrap { flex-grow: 1; position: relative; background-color: var(--editor-bg); }
-.cm-container { position: absolute; inset: 0; }
-.CodeMirror { height: 100% !important; background: transparent !important; }
-/* ... (Styling lain yang tidak berubah) ... */
-.icon-btn{color:var(--text-secondary);background:none;border:none;font-size:18px;padding:8px;cursor:pointer;width:100%}.icon-btn:hover{color:var(--text-primary)}
-.sidebar-header{padding:10px 12px;font-size:12px;color:var(--text-secondary);text-transform:uppercase;display:flex;align-items:center;gap:8px}
-.file-tree{flex:1;overflow:auto;padding:6px 8px;font-size:14px}
-.tree-item{padding:6px 8px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:8px}
-.tree-item:hover{background:var(--list-hover-bg,#2a2d2e)}.tree-item.active{background:var(--list-active-bg,#37373d)}
-.folder-toggle{width:14px;text-align:center;transition:transform .15s}.folder-toggle.expanded{transform:rotate(90deg)}
-.editor-tabs{display:flex;background:var(--tab-inactive-bg);flex-shrink:0;overflow-x:auto;align-items:flex-end;padding:0 4px;border-top:1px solid var(--border-color)}
-.editor-tabs .btn{background:var(--tab-inactive-bg);color:var(--text-secondary);border:none;border-top:1px solid var(--border-color);border-right:1px solid var(--border-color);padding:8px 12px;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;margin-top:5px;border-top-left-radius:4px;border-top-right-radius:4px}
-.editor-tabs .btn:first-child{border-left:1px solid var(--border-color)}
-.editor-tabs .btn.active{background:var(--editor-bg);color:var(--text-primary);border-top-color:var(--accent-blue);border-top-width:2px;border-bottom:1px solid var(--editor-bg);margin-top:3px}
-.editor-tabs .btn .filename{max-width:160px;overflow:hidden;text-overflow:ellipsis}
-.editor-tabs .btn .close-btn{font-weight:bold;cursor:pointer;padding:0 4px;color:var(--text-secondary);font-size:16px;line-height:1;border-radius:3px;margin-left:8px;opacity:.5}
-.editor-tabs .btn:hover .close-btn{opacity:1;background:rgba(255,255,255,.1)}
+.sidebar-header {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.file-tree {
+  flex: 1;
+  overflow: auto;
+  padding: 6px 8px;
+  font-size: 14px;
+}
+.tree-item {
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tree-item:hover { background: #2a2d2e; }
+.tree-item.active { background: #37373d; }
 
+/* WORKBENCH */
+.workbench {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.editor-area {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.editor-wrap {
+  flex-grow: 1;
+  position: relative;
+  background-color: var(--editor-bg);
+}
+.cm-container {
+  position: absolute;
+  inset: 0;
+}
+.CodeMirror {
+  height: 100% !important;
+  background: transparent !important;
+}
 
-/* PREVIEW DENGAN EFEK 3D & RESPONSIF TOTAL (VERSI FINAL) */
-.preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
-.btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
-.preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
-.device-frame { display: flex; flex-direction: column; transition: all 0.4s ease; }
-.device-screen { flex-grow: 1; } /* PERBAIKAN: .device-screen akan mengisi sisa ruang */
-.device-frame iframe{ width: 100%; height: 100%; border: none; }
+/* TABS */
+.editor-tabs {
+  display: flex;
+  background: var(--tab-inactive-bg);
+  overflow-x: auto;
+  padding: 0 4px;
+  border-top: 1px solid var(--border-color);
+}
+.editor-tabs .btn {
+  background: var(--tab-inactive-bg);
+  color: var(--text-secondary);
+  border: none;
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  padding: 8px 12px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 5px;
+  border-radius: 4px 4px 0 0;
+}
+.editor-tabs .btn.active {
+  background: var(--editor-bg);
+  color: var(--text-primary);
+  border-top-color: var(--accent-blue);
+  border-top-width: 2px;
+  margin-top: 3px;
+}
 
-/* BINGKAI DESKTOP GAYA "LOCALHOST" (STABIL) */
+/* PREVIEW */
+.preview-header {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #ddd;
+}
+.btn-back-to-editor {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.preview-content {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow: auto;
+}
+
+/* Desktop Frame */
 #preview-view.view-desktop .device-frame {
-    width: 90vw; max-width: 1400px; aspect-ratio: 16 / 9; max-height: 88vh;
-    border-radius: 8px; border: 1px solid #ccc; background-color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    overflow: hidden;
+  width: 90vw;
+  max-width: 1400px;
+  aspect-ratio: 16 / 9;
+  max-height: 88vh;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  overflow: hidden;
 }
-.browser-bar { flex-shrink: 0; padding: 8px; background-color: #e8e6e8; border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 8px; }
-.dots { display: flex; gap: 6px; }
-.dot { width: 12px; height: 12px; border-radius: 50%; }
-.address-bar { flex-grow: 1; background-color: white; color: #555; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid #ddd; }
-#preview-view.view-desktop .device-screen { overflow: hidden; }
+.browser-bar {
+  padding: 8px;
+  background-color: #e8e6e8;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.address-bar {
+  flex-grow: 1;
+  background-color: white;
+  color: #555;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: monospace;
+}
 
-/* === PERBAIKAN TOTAL: BINGKAI IPHONE 3D & RESPONSIF === */
+/* Mobile Frame */
 #preview-view.view-mobile .device-frame {
-    --iphone-h: 700px;
-    --iphone-w: calc(var(--iphone-h) * (375 / 812));
-    width: var(--iphone-w); height: var(--iphone-h);
-    max-width: 90vw; max-height: 90vh;
-    aspect-ratio: 375 / 812;
-    
-    position: relative;
-    border-radius: 50px;
-    background: #1e1e1e;
-    padding: 12px; /* Jarak antara bingkai dan layar */
-    
-    border: 2px solid #444;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0,0,0,0.3), 0 20px 30px rgba(0,0,0,0.2);
+  width: 375px;
+  height: 700px;
+  border-radius: 50px;
+  background: #1e1e1e;
+  padding: 12px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
-#preview-view.view-mobile .browser-bar { display: none; }
-/* PERBAIKAN: iframe sekarang di dalam .device-screen */
 #preview-view.view-mobile .device-screen {
-    border-radius: 38px;
-    overflow: hidden; /* SANGAT PENTING: Memotong iframe agar pas di dalam bingkai */
-    background: #000; /* Latar belakang hitam jika iframe gagal */
+  border-radius: 38px;
+  overflow: hidden;
+  background: #000;
 }
-#preview-view.view-mobile iframe { border-radius: 0; } /* iframe tidak perlu radius lagi */
-
-/* PONI YANG DIPERBAIKI SECARA FUNDAMENTAL */
 #preview-view.view-mobile .device-frame::before {
-    content: '';
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 45%;
-    height: 25px;
-    background: #1e1e1e;
-    border-bottom-left-radius: 13px;
-    border-bottom-right-radius: 13px;
-    z-index: 2;
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 45%;
+  height: 25px;
+  background: #1e1e1e;
+  border-bottom-left-radius: 13px;
+  border-bottom-right-radius: 13px;
 }
