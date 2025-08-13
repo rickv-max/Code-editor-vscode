@@ -3,7 +3,7 @@
   --activity-bar-bg: #333;
   --sidebar-bg: #252526;
   --editor-bg: #1e1e1e;
-  --preview-bg: #f0f2f5;
+  --preview-bg: #f4f6f9;
   --border-color: #3e3e42;
   --text-primary: #cccccc;
   --text-secondary: #808080;
@@ -12,9 +12,9 @@
 }
 * { box-sizing: border-box; }
 
-/* PERBAIKAN: Memastikan Rantai Tinggi 100% tidak putus */
+/* 1. PERBAIKAN PANEL KODE: Memastikan Rantai Tinggi 100% */
 html, body, .view-container, #editor-view {
-    height: 100vh; /* Gunakan vh untuk kepastian */
+    height: 100vh;
 }
 body { margin: 0; font-family: var(--font-family); background: var(--editor-bg); color: var(--text-primary); overflow: hidden; }
 
@@ -26,7 +26,7 @@ body { margin: 0; font-family: var(--font-family); background: var(--editor-bg);
 body.show-preview #editor-view { opacity: 0; transform: scale(0.95); pointer-events: none; }
 body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; }
 
-/* PERBAIKAN: Layout Panel Kode Full */
+/* LAYOUT EDITOR FULL */
 .activity-bar { width: 48px; flex-shrink: 0; background: var(--activity-bar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; }
 .sidebar { width: 260px; flex-shrink: 0; transition: width .18s ease; background: var(--sidebar-bg); display: flex; flex-direction: column; }
 .sidebar.collapsed { width: 0; }
@@ -34,7 +34,7 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-area { flex-grow: 1; display: flex; flex-direction: column; min-height: 0; }
 .editor-wrap { flex-grow: 1; position: relative; background-color: var(--editor-bg); }
 .cm-container { position: absolute; inset: 0; }
-.CodeMirror { height: 100% !important; }
+.CodeMirror { height: 100% !important; background: transparent !important; }
 
 /* Styling lain yang tidak berubah */
 .icon-btn{color:var(--text-secondary);background:none;border:none;font-size:18px;padding:8px;cursor:pointer;width:100%}.icon-btn:hover{color:var(--text-primary)}
@@ -51,7 +51,7 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
 .editor-tabs .btn .close-btn{font-weight:bold;cursor:pointer;padding:0 4px;color:var(--text-secondary);font-size:16px;line-height:1;border-radius:3px;margin-left:8px;opacity:.5}
 .editor-tabs .btn:hover .close-btn{opacity:1;background:rgba(255,255,255,.1)}
 
-/* === PERBAIKAN: PREVIEW RESPONSIF & LAYOUT === */
+/* 2. PERBAIKAN: PREVIEW RESPONSIF TOTAL */
 .preview-header{flex-shrink:0;padding:8px 16px;background-color:white;display:flex;align-items:center;gap:16px;border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
 .btn-back-to-editor{background:#333;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px}
 .preview-content{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:auto}
@@ -59,45 +59,49 @@ body.show-preview #preview-view { display: flex; opacity: 1; transform: scale(1)
     display: flex;
     flex-direction: column;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: white;
     transition: all 0.4s ease;
 }
-.device-frame iframe{ flex-grow: 1; border: none; }
+.device-frame iframe{ flex-grow: 1; border: none; background: white; }
 
-/* BINGKAI DESKTOP GAYA "LOCALHOST" - PANJANG KE SAMPING */
+/* BINGKAI DESKTOP GAYA "LOCALHOST" */
 #preview-view.view-desktop .device-frame {
-    width: 90vw; /* Lebar 90% dari layar */
+    width: 90vw;
     max-width: 1400px;
-    aspect-ratio: 16 / 9; /* PAKSA RASIO LAYAR LEBAR (INI KUNCINYA!) */
-    max-height: 85vh; /* Jangan sampai terlalu tinggi */
+    height: 85vh; /* Tinggi 85% dari layar */
+    border-radius: 8px;
     border: 1px solid #ccc;
+    background-color: white;
 }
-.browser-bar {
-    flex-shrink: 0; padding: 8px; background-color: #e8e6e8;
-    border-bottom: 1px solid #ccc;
-}
+.browser-bar { flex-shrink: 0; padding: 8px; background-color: #e8e6e8; border-bottom: 1px solid #ccc; }
 .dots { display: flex; gap: 6px; }
 .dot { width: 12px; height: 12px; border-radius: 50%; }
 
-/* BINGKAI PONSEL GAYA FISIK - RESPONSIF */
+/* BINGKAI PONSEL GAYA FISIK - RESPONSIF TOTAL */
 #preview-view.view-mobile .device-frame {
-    width: 375px;
-    height: 812px;
-    flex-shrink: 0;
-    max-width: 95vw; /* Agar tidak meluap di layar HP yang lebih kecil */
-    max-height: 90vh; /* Agar tidak meluap secara vertikal */
-    border: 8px solid #1c1c1c;
-    border-radius: 44px;
-    padding: 8px;
-    background: #111;
+    width: 375px; /* Lebar ideal */
+    max-width: 95%; /* TIDAK AKAN PERNAH meluap dari layar */
+    aspect-ratio: 375 / 812; /* PAKSA rasio agar tidak penyet */
+    max-height: 95vh; /* Jaga agar tidak terlalu tinggi */
+    border: 12px solid #1c1c1c;
+    border-radius: 52px;
+    background-color: #111;
+    padding: 0; /* Padding akan dikontrol oleh border */
+    position: relative; /* Wajib untuk poni */
 }
 #preview-view.view-mobile .browser-bar { display: none; }
-#preview-view.view-mobile iframe { border-radius: 36px; }
-#preview-view.view-mobile::before {
-    content: ''; position: absolute; top: 16px; left: 50%;
-    transform: translateX(-50%); width: 50%; height: 26px;
-    background: #111; border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px; z-index: 10;
+#preview-view.view-mobile iframe { border-radius: 40px; /* Sudut dalam harus lebih kecil dari bingkai */ }
+
+/* PERBAIKAN PONI IPHONE RUSAK */
+#preview-view.view-mobile .device-frame::before {
+    content: '';
+    position: absolute;
+    top: 0px; /* Menempel di atas bingkai */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 30px; /* Tinggi poni */
+    background: #1c1c1c; /* Sama dengan warna border */
+    border-bottom-left-radius: 13px;
+    border-bottom-right-radius: 13px;
+    z-index: 2; /* Di atas iframe */
 }
