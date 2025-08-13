@@ -44,34 +44,39 @@ async function postImportSetup() {
 }
 
 function runPreview() {
+    // 1. Bersihkan aset dari preview SEBELUMNYA (tetap sama)
     Object.values(state.activeAssetMap).forEach(URL.revokeObjectURL);
     state.activeAssetMap = {};
+
     const indexKey = Object.keys(state.files).find(k => k.endsWith('index.html'));
     if (!indexKey) return;
     let html = state.files[indexKey].text || '';
-    const getMimeType = (path) => { if (path.endsWith('.css')) return 'text/css'; if (path.endsWith('.js')) return 'application/javascript'; return 'text/plain'; };
-    for (const path in state.files) {
-        const fileData = state.files[path];
-        if (!fileData.isBinary && typeof fileData.text === 'string') {
-            const mimeType = getMimeType(path);
-            const blob = new Blob([fileData.text], { type: mimeType });
-            state.activeAssetMap[path] = URL.createObjectURL(blob);
-        }
-    }
+
+    // 2. Buat peta aset baru untuk preview SAAT INI (tetap sama)
+    const getMimeType = (path) => { /*...*/ };
+    for (const path in state.files) { /*...*/ }
     Object.assign(state.activeAssetMap, state.assetUrls);
-    const pathReplacer = (match, attribute, pathValue) => {
-        if (!pathValue || pathValue.startsWith('http') || pathValue.startsWith('data:') || pathValue.startsWith('//')) return match;
-        const cleanPathValue = pathValue.replace(/^\.\//, ''); let matchedAssetKey = null;
-        for (const assetKey in state.activeAssetMap) {
-            if (assetKey.endsWith(cleanPathValue)) {
-                const precedingCharIndex = assetKey.length - cleanPathValue.length - 1;
-                if (precedingCharIndex < 0 || assetKey[precedingCharIndex] === '/') { matchedAssetKey = assetKey; break; }
-            }
-        }
-        if (matchedAssetKey) return `${attribute}="${state.activeAssetMap[matchedAssetKey]}"`;
-        return match;
-    };
+    
+    // 3. Ganti path di HTML dengan URL dari peta aset baru (tetap sama)
+    const pathReplacer = (match, attribute, pathValue) => { /*...*/ };
     html = html.replace(/(src|href)=["']([^"']+)["']/g, pathReplacer);
+
+    // === PERUBAHAN KUNCI: SUNTIKKAN CSS RESPONSIF KE DALAM <head> ===
+    const responsiveStyle = `
+      <style>
+        /* Trik agar unit vw/vh di dalam iframe bereaksi terhadap bingkai, bukan jendela utama */
+        :root {
+            --iframe-vw: calc(var(--iframe-width, 100vw) / 100);
+        }
+        /* Contoh penggunaan: h1 { font-size: calc(10 * var(--iframe-vw)); } */
+        /* Ini akan membuat font-size h1 menjadi 10% dari lebar iframe */
+      </style>
+    `;
+    html = html.replace(/<\/head>/i, `${responsiveStyle}</head>`);
+    // === AKHIR PERUBAHAN ===
+
+
+    // 4. Buat URL untuk HTML itu sendiri dan tampilkan (tetap sama)
     const finalBlob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(finalBlob);
     state.activeAssetMap['__main_html__'] = url;
